@@ -8,15 +8,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST["email"];
     $password = password_hash($_POST["password"], PASSWORD_DEFAULT); // Hash the password
 
-    // Default image path
+    // par defaut:
     $img = "default.jpg";
 
-    // Check if the image was uploaded
+    // test if the image upload
     if ($_FILES['profilePicture']['name']) {
         $targetDirectory = "upload/";
         $targetPath = $targetDirectory . basename($_FILES['profilePicture']['name']);
         
-        // Create the "upload" directory if it doesn't exist
+        // upload
         if (!file_exists($targetDirectory)) {
             mkdir($targetDirectory, 0755, true);
         }
@@ -36,22 +36,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $query = "INSERT INTO users (username, password, email, image_url, role) VALUES (?, ?, ?, ?, 'user')";
     $stmt = $con->prepare($query);
 
-    if ($stmt) {
+    // if ($stmt) {
         $stmt->bind_param("ssss", $username, $password, $email, $img);
-        $stmt->execute();
-        $stmt->close();
-        
-        // Registration successful, you can redirect the user to another page if needed
-        header("Location: index.php");
+        try{
+          $stmt->execute();
+          header("Location: index.php");
         exit();
-    } else {
-        // Registration failed, handle the error
-        echo "Error: " . $mysqli->error;
-    }
+        }catch(Exception $p) 
+        {
+          echo "Error inserting user data into database";
+        }
+        $stmt->close();
+        // Registration successful, you can redirect the user to another page if needed
+        
+    //     header("Location: index.php");
+    //     exit();
+    // } else {
+    //   echo"Login failed";
+    //     // Registration failed, handle the error
+    //     echo "Error: " . $mysqli->error;
+    // }
 
     // Close the database connection
     $mysqli->close();
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -87,8 +96,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <input type="file" id="profilePicture" name="profilePicture" accept="image/*" class="mt-1 p-2 w-full border rounded-md">
           </div>
           <div class="mt-6">
-            <input type="checkbox" id="acceptTerms" name="acceptTerms" class="border border-gray-400">
-            <label for="acceptTerms" class="ml-2 text-sm text-gray-600">I accept the <a href="#" class="text-purple-500 font-semibold">Terms of Use</a> & <a href="#" class="text-purple-500 font-semibold">Privacy Policy</a></label>
+          <p class="mt-4 text-gray-600 text-xs text-center">have an account? <a href="./index.php" class="text-blue-500 hover:underline">Log In here</a>.</p>
           </div>
           <div class="mt-6">
             <button type="submit" class="w-full bg-red-500 text-white py-2 rounded-2xl hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300">Register Now</button>
